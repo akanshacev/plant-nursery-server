@@ -33,10 +33,6 @@ const plantSchema=new mongoose.Schema({
         type:Number,
         required:true
     },
-    status:{
-        type:Boolean,
-        required:true
-    },
     userId:{
         type:String,
         required:true
