@@ -1,4 +1,6 @@
-const carts=require('../Model/cartModel')
+const { default: mongoose } = require('mongoose');
+const carts=require('../Model/cartModel');
+const plants = require('../Model/plantModel');
 
 exports.addtocart=async(req,res)=>{
     try{
@@ -41,33 +43,40 @@ exports.addtocart=async(req,res)=>{
              return res.status(200).json("new cart created")
 
         }
-        // const existingPlant = await carts.findOne({plantId,userId:currentuser})
-        // console.log(existingPlant)
-        // if(existingPlant){
-        //     return res.json({
-        //         message:"plant already added",
-        //         success:true,
-        //         error:false
-        //     })
-        // }
-        // else{
-        //     const payload={
-        //         plantId:plantId,
-        //         quantity:1,
-        //         userId:currentuser
-        //     }
-        //     const newaddtocart = carts(payload)
-        //     const savecart = await newaddtocart.save()
-        //     res.json({
-        //         data:savecart,
-        //         message:"plant added",
-        //         success:true,
-        //         error:false
-        //     })
-        // }
     }
     catch(error){
         console.log(error)
         res.status(error.status || 500).json({ message: error.message || "Internal Server Error" })    }
    
 }
+exports.getCartItems = async(req,res)=>{
+    try {
+        const currentUser = req.payload;
+        console.log(currentUser);
+
+        let userCart = await carts.findOne({ userId: currentUser }).populate('plants.plantId');
+        
+        if (!userCart) {
+            return res.status(404).json({ message: "Cart not found" });
+        }
+        // console.log("inside user cart")
+        return res.status(200).json(userCart);
+    } catch (error) {
+        console.log(error);
+        res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
+    }
+}
+
+exports.removeCartitem =async (details)=>{
+    const catid = new mongoose.Types.ObjectId(details.carts)
+    const plantId= new mongoose.Types.ObjectId(details.plants)
+    return await new Promise((resolve,reject)=>{
+         carts.findByIdAndUpdate({_id:catid,plants:{$elemMatch:{plantId:plantId}}},{
+            $pull:{plants:{plantId:plantId}},
+            $inc:{totalquantity:-1}
+         }).then((data)=>{
+            resolve({removePlant:true})
+         })
+    })
+}
+

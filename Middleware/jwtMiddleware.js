@@ -14,9 +14,9 @@ const jwtMiddlewareFun=(req,res,next)=>{
             res.status(406).json("Please Login First")
         }
     }
-    catch{
-        res.status(406).json("Login First")
-    }
+    catch(error){
+        console.log(error)
+        res.status(error.status || 500).json({ message: error.message || "Internal Server Error" })    }
    
    
 }

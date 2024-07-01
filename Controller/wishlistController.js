@@ -1,75 +1,58 @@
+const { default: mongoose } = require('mongoose');
 const wishlists = require('../Model/wishlistModel')
 
-exports.addtoWish=async(req,res)=>{
-    try{
-        const plantId=req?.params.id
-    console.log("plant==",plantId);
+exports.addtoWish = async (req, res) => {
+    try {
+        const plantId = req?.params.id;
 
-    const currentuser=req.payload
-    console.log(currentuser)
-    
-    let userwish=await wishlists.findOne({userId:currentuser})
-    if(userwish){
-        const existingPlant= await wishlists.findOne({ $and:[{userId:currentuser},{plants:{$elemMatch:{plantId}}}]})
-        if(existingPlant){
-            return res.status(406).json("Plant Already Added!!")
-        }
-        else{
-            const newplant={
-                plantId
+        const userId = req.payload; 
+        console.log(userId);
+
+        let userwish = await wishlists.findOne({ userId });
+        if (userwish) {
+            const existingPlant = await wishlists.findOne({ $and: [{ userId }, { plants: { $elemMatch: { plantId } } }] });
+            if (existingPlant) {
+                return res.status(400).json("Plant Already Added!!");
+            } else {
+                const newPlant = {
+                    plantId
+                };
+                await wishlists.findByIdAndUpdate(userwish._id, { $inc: { totalquantity: 1 }, $push: { plants: newPlant } });
+                return res.status(200).json("Plant added to wishlist");
             }
-            await wishlists.findByIdAndUpdate({userId:currentuser},{$inc:{totalquantity:1},$push:{plants:newplant}})
-            return res.status(200).json("plant added to wishlist")
+        } else {
+            const newWishlist = new wishlists({
+                userId,
+                plants: [
+                    {
+                        plantId: plantId
+                    }
+                ],
+                totalquantity: 1
+            });
+            await newWishlist.save();
+            return res.status(200).json("New Wishlist Created");
         }
-    }
-    else{
-        const newWishlist=new wishlists({
-            userId:currentuser,
-            plants:[
-                {
-                    plantId:plantId
-                }
-            ],
-            totalquantity:1
-        })
-        newWishlist.save()
-        return res.status(200).json("new Wishlist Created")
-    }
-    }
-    catch(error){
+    } catch (error) {
         console.log(error);
-        res.status(error.status || 500).json({ message : error.message || "Internal Server Error"})
+        res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
     }
-    
+};
+
+exports.getwish = async(req,res)=>{
+    try {
+        const currentUser = req.payload;
+        console.log(currentUser);
+
+        let userWish = await wishlists.findOne({ userId: currentUser }).populate('plants.plantId');
+        
+        if (!userWish) {
+            return res.status(404).json({ message: "Wishlist not found" });
+        }
+        // console.log("inside user cart")
+        return res.status(200).json(userWish);
+    } catch (error) {
+        console.log(error);
+        res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
+    }
 }
-
-// const plants = require('../Model/plantModel')
-
-// exports.addToWishlist=async(req,res)=>{
-//     const {plantName,plantType,image,plantWater,plantMRP,plantMaintanance,description}=req.body
-//     const userId = req.payload
-
-//     const existingPlant=await wishlists.findOne({userId,plantName})
-
-// }
-
-// exports.addtowishlist = async (req, res) => {
-//     try {
-//         let wishlist = await wishlists.findOne({ userId: req.params.userId })
-        // if (!wishlist) {
-//             wishlist = new wishlists({ userId: req.params.userId, plants: [] })
-//         }
-//         const plant = await plants.findById(req.params.plantId)
-//         if (!plant) {
-//             return res.status(404).json("Plant Not Found")
-//         }
-//         wishlist.plants.push({ plantId: req.params.plantId })
-//         await wishlist.save()
-//         res.status(201).json(wishlist)
-//     }
-//     catch(err){
-//         console.log(err)
-//         res.status(500).json(err)
-//     }
-  
-// }

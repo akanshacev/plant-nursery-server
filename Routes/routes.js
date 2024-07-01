@@ -18,6 +18,9 @@ router.put('/edit-plant/:pid',jwtMiddleware,multerconfig.single('image'),plantCo
 router.delete('/deleteplant/:pid',jwtMiddleware,plantController.removeplant)
 
 router.post('/addtocart/:id',jwtMiddleware,addtocartController.addtocart)
+router.get('/getcart',jwtMiddleware,addtocartController.getCartItems)
+router.put('/rmcartitem/:id',jwtMiddleware,addtocartController.removeCartitem)
 
-router.post('/addtowish/:id',jwtMiddleware,wishlistController.addtoWish)
+router.post('/addtowishlist/:id',jwtMiddleware,wishlistController.addtoWish)
+router.get('/getwish',jwtMiddleware,wishlistController.getwish)
 module.exports=router
