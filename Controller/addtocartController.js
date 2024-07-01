@@ -67,16 +67,26 @@ exports.getCartItems = async(req,res)=>{
     }
 }
 
-exports.removeCartitem =async (details)=>{
-    const catid = new mongoose.Types.ObjectId(details.carts)
-    const plantId= new mongoose.Types.ObjectId(details.plants)
-    return await new Promise((resolve,reject)=>{
-         carts.findByIdAndUpdate({_id:catid,plants:{$elemMatch:{plantId:plantId}}},{
-            $pull:{plants:{plantId:plantId}},
-            $inc:{totalquantity:-1}
-         }).then((data)=>{
-            resolve({removePlant:true})
-         })
-    })
+exports.removeCartitem = async (req, res) => {
+    try {
+        const plantId = new mongoose.Types.ObjectId(req.params.id)
+        const currentUser = req.payload
+        let cart = await carts.findOne({ userId: currentUser })
+        const cartId = cart._id
+
+        let update =await carts.findByIdAndUpdate({ _id: cartId, plants: { $elemMatch: { plantId: plantId } } }, {
+            $pull: { plants: { plantId: plantId } },
+            $inc: { totalquantity: -1 }
+        })
+
+        if (update) {
+            res.status(200).json("Product Deleted From cart")
+        } else {
+            res.status(400).json("Unable to delete")
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(error.status || 500).json({ message: error.message || "Internal Server Error" });
+    }
 }
 

@@ -6,6 +6,7 @@ const router=express.Router()
 const jwtMiddleware=require('../Middleware/jwtMiddleware')
 const multerconfig = require('../Middleware/multerMiddleware')
 const addtocartController = require('../Controller/addtocartController')
+const orderController = require('../Controller/orderContoller')
 
 
 router.post('/reg',userController.userRegister)
@@ -23,4 +24,8 @@ router.put('/rmcartitem/:id',jwtMiddleware,addtocartController.removeCartitem)
 
 router.post('/addtowishlist/:id',jwtMiddleware,wishlistController.addtoWish)
 router.get('/getwish',jwtMiddleware,wishlistController.getwish)
+router.put('/rmwish/:id',jwtMiddleware,wishlistController.removeWhlist)
+
+router.post('/placeOrder/',jwtMiddleware,orderController.placeOrder)
+router.get('/getorder',jwtMiddleware,orderController.getOrders)
 module.exports=router

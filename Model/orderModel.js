@@ -1,26 +1,26 @@
 const mongoose = require('mongoose')
 
 const oderSchema = mongoose.Schema({
-    username: {
-        type: String
-    },
-    phone: {
-        type: Number
+    userId: {
+        type: String,
     },
     address: {
-        place:{
+        userName:{
             type:String
         },
-        pincode: {
-            type: Number,
+        houseName:{
+            type:String
         },
-        dist: {
+        homeTown: {
             type: String,
         },
-        state: {
+        post: {
             type: String,
         },
-        locality: {
+        pinCode: {
+            type: String,
+        },
+        mobileNumber: {
             type: String,
         },
 
@@ -28,27 +28,26 @@ const oderSchema = mongoose.Schema({
     paymentmode: {
         type: String,
     },
-    userId: {
-        type: String,
-    },
-    orderitem:[{
-        plant:{
-            type:mongoose.Schema.Types.ObjectId,
-            ref:"plants",
-            required:true
-        },
-        quantity:{
-            type:Number,
-            required:true
-        },
-        plantMRP:{
-            type:Number,
-        },
-        totalamount:{
-            type:Number
-        }
-    }],
 
+    orderItems: [
+        {
+            plantId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "plants",
+                require: true
+            },
+            quantity: {
+                type: Number,
+            },
+
+        }
+    ],
+    totalQuantity:{
+        type:String
+    },
+    totalAmount:{
+        type:String
+    }
 })
 const orders = mongoose.model('orders', oderSchema)
 module.exports = orders
