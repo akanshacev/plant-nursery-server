@@ -1,5 +1,13 @@
 const mongoose = require('mongoose')
 
+
+const getCurrentLocalTime = () => {
+    const date = new Date();
+    const offset = date.getTimezoneOffset(); // Offset in minutes
+    return new Date(date.getTime() - (offset * 60 * 1000)); // Adjusting to local time
+};
+
+
 const oderSchema = mongoose.Schema({
     userId: {
         type: String,
@@ -47,6 +55,10 @@ const oderSchema = mongoose.Schema({
     },
     totalAmount:{
         type:String
+    },
+    createAt:{
+        type:Date,
+        default:getCurrentLocalTime
     }
 })
 const orders = mongoose.model('orders', oderSchema)

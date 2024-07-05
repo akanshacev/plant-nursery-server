@@ -46,12 +46,11 @@ exports.getOrders = async(req,res)=>{
         const currentUser = req.payload;
         console.log(currentUser);
 
-        let order = await orders.find().populate('orderItems.plantId');
+        let order = await orders.find().populate('orderItems.plantId').sort({ createAt: -1 });
         
         if (!order) {
             return res.status(404).json({ message: "No Orders Found" });
         }
-        // console.log("inside user cart")
         return res.status(200).json(order);
     } catch (error) {
         console.log(error);
